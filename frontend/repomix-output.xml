@@ -1,0 +1,943 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+src/
+  pages/
+    Cadastro/
+      Cadastro.css
+      Cadastro.jsx
+    DashboardUsuario/
+      DashboardUsuario.css
+      DashboardUsuario.jsx
+    Login/
+      Login.css
+      Login.jsx
+  services/
+    api.js
+  App.jsx
+  main.jsx
+Dockerfile.dev
+index.html
+package.json
+vite.config.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="src/pages/Cadastro/Cadastro.css">
+.cadastro-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f6f9;
+}
+
+.cadastro-form {
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cadastro-form h2 {
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.cadastro-form p {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.input-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #444;
+}
+
+.input-group input,
+.input-group select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: #fff;
+}
+
+.btn-submit {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s;
+}
+
+.btn-submit:hover {
+  background-color: #0056b3;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #007bff;
+  margin-top: 15px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+.alert-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+</file>
+
+<file path="src/pages/Cadastro/Cadastro.jsx">
+import React, { useState, useEffect } from 'react';
+import api, { listarSecretarias } from '../../services/api';
+import './Cadastro.css';
+
+function Cadastro({ onVoltarLogin, onCadastroSucesso }) {
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [secretaria, setSecretaria] = useState('');
+  
+  const [secretariasList, setSecretariasList] = useState([]);
+  
+  const [erro, setErro] = useState('');
+  const [sucesso, setSucesso] = useState('');
+  const [carregando, setCarregando] = useState(false);
+
+  useEffect(() => {
+    async function carregarSecretarias() {
+      try {
+        const dados = await listarSecretarias();
+        setSecretariasList(dados);
+      } catch (err) {
+        console.error('Erro ao carregar secretarias:', err);
+      }
+    }
+    carregarSecretarias();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErro('');
+    setSucesso('');
+    setCarregando(true);
+
+    try {
+      await api.post('/usuarios/cadastrar', { 
+        nome, 
+        email, 
+        senha, 
+        telefone, 
+        secretariaId: secretaria ? Number(secretaria) : null,
+        tipo: 'USER'
+      });
+      
+      setSucesso('Conta criada com sucesso! A redirecionar para o login...');
+      setTimeout(() => {
+        onCadastroSucesso();
+      }, 2000);
+    } catch (err) {
+      console.error('Erro detalhado do backend:', err);
+      
+      const dadosErro = err.response?.data;
+      let mensagemErro = 'Erro ao realizar o registo. Verifique os dados ou tente novamente.';
+
+      if (typeof dadosErro === 'string') {
+        mensagemErro = dadosErro;
+      } else if (dadosErro?.message) {
+        mensagemErro = dadosErro.message;
+      } else if (dadosErro?.errors && Array.isArray(dadosErro.errors)) {
+        mensagemErro = dadosErro.errors.map(e => e.defaultMessage).join(', ');
+      }
+
+      setErro(mensagemErro);
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  return (
+    <div className="cadastro-container">
+      <form onSubmit={handleSubmit} className="cadastro-form">
+        <h2>Criar Conta</h2>
+        <p>Preencha os dados abaixo para se registar no sistema de chamados.</p>
+
+        {erro && <div className="alert-error">{erro}</div>}
+        {sucesso && <div className="alert-success">{sucesso}</div>}
+
+        <div className="input-group">
+          <label>Nome Completo</label>
+          <input 
+            type="text" 
+            value={nome} 
+            onChange={(e) => setNome(e.target.value)} 
+            placeholder="Digite o seu nome"
+            required 
+          />
+        </div>
+
+        <div className="input-group">
+          <label>E-mail</label>
+          <input 
+            type="email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            placeholder="seu.email@exemplo.com"
+            required 
+          />
+        </div>
+
+        <div className="input-group">
+          <label>Telefone</label>
+          <input 
+            type="text" 
+            value={telefone} 
+            onChange={(e) => setTelefone(e.target.value)} 
+            placeholder="(00) 00000-0000"
+            required 
+          />
+        </div>
+
+        <div className="input-group">
+          <label>Secretaria / Departamento</label>
+          <select 
+            value={secretaria} 
+            onChange={(e) => setSecretaria(e.target.value)}
+            required
+          >
+            <option value="">Selecione a sua secretaria...</option>
+            {secretariasList.map((sec) => {
+              const idVal = sec.id !== undefined ? sec.id : sec;
+              const nomeVal = sec.nome !== undefined ? sec.nome : sec;
+              return (
+                <option key={idVal} value={idVal}>
+                  {nomeVal}
+                </option>
+              );
+            })}
+          </select>
+        </div>
+
+        <div className="input-group">
+          <label>Palavra-passe (Senha)</label>
+          <input 
+            type="password" 
+            value={senha} 
+            onChange={(e) => setSenha(e.target.value)} 
+            placeholder="Crie uma senha forte"
+            required 
+          />
+        </div>
+
+        <button type="submit" className="btn-submit" disabled={carregando}>
+          {carregando ? 'A registar...' : 'Cadastrar'}
+        </button>
+
+        <button type="button" className="btn-link" onClick={onVoltarLogin}>
+          Já tem uma conta? Faça login
+        </button>
+      </form>
+    </div>
+  );
+}
+
+export default Cadastro;
+</file>
+
+<file path="src/pages/DashboardUsuario/DashboardUsuario.css">
+.dashboard-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  font-family: sans-serif;
+  color: #333;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.user-welcome h2 {
+  margin: 0 0 4px 0;
+  color: #111827;
+}
+
+.user-welcome p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.btn-sair {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-sair:hover {
+  background-color: #fecaca;
+}
+
+.dashboard-actions {
+  margin-bottom: 30px;
+}
+
+.btn-novo-chamado {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-novo-chamado:hover {
+  background-color: #1d4ed8;
+}
+
+.chamados-section h3 {
+  margin-bottom: 16px;
+  color: #1f2937;
+}
+
+.loading-text, .empty-text {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.error-message {
+  background-color: #fef2f2;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #fecaca;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.chamados-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.chamados-table th, .chamados-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.875rem;
+}
+
+.chamados-table th {
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+/* Cores dinâmicas simples para os status dos chamados */
+.badge-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+
+.status-aberto { background-color: #e0f2fe; color: #0369a1; }
+.status-em_andamento { background-color: #fef3c7; color: #d97706; }
+.status-concluido { background-color: #dcfce7; color: #15803d; }
+</file>
+
+<file path="src/pages/DashboardUsuario/DashboardUsuario.jsx">
+import React, { useEffect, useState } from 'react';
+import { buscarMeusChamados } from '../../services/api';
+import './DashboardUsuario.css';
+
+export default function DashboardUsuario({ onLogout, onIrParaNovoChamado }) {
+  const [chamados, setChamados] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [erro, setErro] = useState('');
+
+  // Recupera os dados do usuário salvos no login
+  const usuarioSalvo = JSON.parse(localStorage.getItem('usuario') || '{}');
+
+  useEffect(() => {
+    async function carregarDados() {
+      try {
+        const dados = await buscarMeusChamados();
+        setChamados(dados);
+      } catch (err) {
+        setErro(err.message);
+      } finally {
+        setCarregando(false);
+      }
+    }
+    carregarDados();
+  }, []);
+
+  return (
+    <div className="dashboard-container">
+      {/* Cabeçalho */}
+      <header className="dashboard-header">
+        <div className="user-welcome">
+          <h2>Olá, {usuarioSalvo.nome || 'Usuário'}</h2>
+          <p>Acompanhe o status dos seus chamados de TI</p>
+        </div>
+        <button onClick={onLogout} className="btn-sair">Sair</button>
+      </header>
+
+      {/* Ações Rápidas */}
+      <section className="dashboard-actions">
+        <button onClick={onIrParaNovoChamado} className="btn-novo-chamado">
+          + Abrir Novo Chamado
+        </button>
+      </section>
+
+      {/* Listagem de Chamados */}
+      <section className="chamados-section">
+        <h3>Meus Chamados</h3>
+
+        {carregando && <p className="loading-text">Carregando chamados...</p>}
+        {erro && <div className="error-message">{erro}</div>}
+
+        {!carregando && !erro && chamados.length === 0 && (
+          <p className="empty-text">Você ainda não abriu nenhum chamado.</p>
+        )}
+
+        {!carregando && chamados.length > 0 && (
+          <div className="table-responsive">
+            <table className="chamados-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Assunto / Descrição</th>
+                  <th>Status</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                {chamados.map((chamado) => (
+                  <tr key={chamado.id}>
+                    <td>#{chamado.id}</td>
+                    <td>{chamado.descricao}</td>
+                    <td>
+                      <span className={`badge-status status-${chamado.status?.toLowerCase()}`}>
+                        {chamado.status}
+                      </span>
+                    </td>
+                    <td>{new Date(chamado.dataAbertura).toLocaleDateString('pt-BR')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+</file>
+
+<file path="src/pages/Login/Login.css">
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f6f9;
+}
+
+.login-form {
+  background: white;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-header {
+  margin-bottom: 24px;
+}
+
+.login-header h2 {
+  margin-bottom: 6px;
+  color: #333;
+  font-size: 24px;
+}
+
+.login-header p {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.input-group {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-group label {
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #444;
+}
+
+.input-group input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+  border-color: #007bff;
+}
+
+.btn-submit {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s;
+}
+
+.btn-submit:hover {
+  background-color: #0056b3;
+}
+
+.btn-submit:disabled {
+  background-color: #a0c4ff;
+  cursor: not-allowed;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #007bff;
+  margin-top: 15px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+.alert-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+</file>
+
+<file path="src/pages/Login/Login.jsx">
+import React, { useState } from 'react';
+import api from '../../services/api';
+import './Login.css';
+
+export default function Login({ onLoginSuccess, onIrParaCadastro }) {
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [erro, setErro] = useState('');
+  const [carregando, setCarregando] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErro('');
+    setCarregando(true);
+
+    try {
+      // Ajuste o endpoint conforme a rota de autenticação do seu backend Spring Boot (ex: /auth/login)
+      const response = await api.post('/auth/login', { email, senha });
+      
+      // Armazena o token JWT retornado pelo backend
+      const token = response.data.token || response.data;
+      localStorage.setItem('token', token);
+      
+      if (response.data.usuario) {
+        localStorage.setItem('usuario', JSON.stringify(response.data.usuario));
+      }
+
+      onLoginSuccess();
+    } catch (err) {
+      console.error(err);
+      setErro('E-mail ou palavra-passe incorretos. Verifique os seus dados.');
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <form onSubmit={handleSubmit} className="login-form">
+        <div className="login-header">
+          <h2>Sistema de Chamados</h2>
+          <p>Entre com as suas credenciais para aceder ao painel</p>
+        </div>
+
+        {erro && <div className="alert-error">{erro}</div>}
+
+        <div className="input-group">
+          <label>E-mail</label>
+          <input 
+            type="email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            placeholder="seu.email@exemplo.com"
+            required 
+          />
+        </div>
+
+        <div className="input-group">
+          <label>Palavra-passe (Senha)</label>
+          <input 
+            type="password" 
+            value={senha} 
+            onChange={(e) => setSenha(e.target.value)} 
+            placeholder="********"
+            required 
+          />
+        </div>
+
+        <button type="submit" className="btn-submit" disabled={carregando}>
+          {carregando ? 'A entrar...' : 'Entrar'}
+        </button>
+
+        {onIrParaCadastro && (
+          <button type="button" className="btn-link" onClick={onIrParaCadastro}>
+            Não tem uma conta? Cadastre-se
+          </button>
+        )}
+      </form>
+    </div>
+  );
+}
+</file>
+
+<file path="src/services/api.js">
+// URL base da API
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+
+// Função auxiliar genérica para requisições usando fetch (simulando Axios)
+async function request(endpoint, options = {}) {
+  const token = localStorage.getItem('token');
+  
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...(options.headers || {}),
+  };
+
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw { response: { data: errorData } };
+  }
+
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : null;
+
+  return { data };
+}
+
+// Objeto 'api' simulando o Axios (utilizado pelo Login.jsx)
+const api = {
+  get: (endpoint) => request(endpoint, { method: 'GET' }),
+  post: (endpoint, body) => request(endpoint, { method: 'POST', body: JSON.stringify(body) }),
+  put: (endpoint, body) => request(endpoint, { method: 'PUT', body: JSON.stringify(body) }),
+  delete: (endpoint) => request(endpoint, { method: 'DELETE' }),
+};
+
+// ==================== EXPORTS NOMEADOS ====================
+
+export async function buscarMeusChamados() {
+  const response = await api.get('/chamados/meus');
+  return response.data;
+}
+
+export async function criarChamado(dadosChamado) {
+  const response = await api.post('/chamados', dadosChamado);
+  return response.data;
+}
+
+export async function listarTodosChamados() {
+  const response = await api.get('/chamados');
+  return response.data;
+}
+
+export async function listarSecretarias() {
+  const response = await api.get('/secretarias');
+  return response.data;
+}
+
+export default api;
+</file>
+
+<file path="src/App.jsx">
+import React, { useState, useEffect } from 'react';
+import Login from './pages/Login/Login';
+import DashboardUsuario from './pages/DashboardUsuario/DashboardUsuario';
+import Cadastro from './pages/Cadastro/Cadastro';
+
+export default function App() {
+  const [autenticado, setAutenticado] = useState(false);
+  const [telaAtual, setTelaAtual] = useState('login'); // 'login', 'cadastro', ou 'dashboard'
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      setAutenticado(true);
+      setTelaAtual('dashboard');
+    }
+  }, []);
+
+  const handleLoginSucesso = () => {
+    setAutenticado(true);
+    setTelaAtual('dashboard');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
+    setAutenticado(false);
+    setTelaAtual('login');
+  };
+
+  if (!autenticado) {
+    if (telaAtual === 'cadastro') {
+      return (
+        <Cadastro 
+          onVoltarLogin={() => setTelaAtual('login')} 
+          onCadastroSucesso={() => setTelaAtual('login')} 
+        />
+      );
+    }
+    return (
+      <Login 
+        onLoginSuccess={handleLoginSucesso} 
+        onIrParaCadastro={() => setTelaAtual('cadastro')} 
+      />
+    );
+  }
+
+  if (telaAtual === 'dashboard') {
+    return (
+      <DashboardUsuario 
+        onLogout={handleLogout} 
+        onIrParaNovoChamado={() => alert('Tela de novo chamado em construção!')} 
+      />
+    );
+  }
+
+  return null;
+}
+</file>
+
+<file path="src/main.jsx">
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+</file>
+
+<file path="Dockerfile.dev">
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copia os ficheiros de dependências
+COPY package*.json ./
+
+RUN npm install
+
+# Copia o restante código do front-end
+COPY . .
+
+# Expõe a porta do Vite
+EXPOSE 3000
+
+# Executa o servidor de desenvolvimento
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+</file>
+
+<file path="index.html">
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema de Chamados TI</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+</file>
+
+<file path="package.json">
+{
+  "name": "sistema-chamados-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.1.6"
+  }
+}
+</file>
+
+<file path="vite.config.js">
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    host: '0.0.0.0',
+    port: 3000,
+    strictPort: true,
+    watch: {
+      usePolling: true, // Deteta alterações do Windows no Docker
+    },
+    hmr: {
+      clientPort: 3000, // Sincroniza o WebSocket do HMR
+    },
+  },
+})
+</file>
+
+</files>

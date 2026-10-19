@@ -1,0 +1,68 @@
+# ============================================
+# Sistema de Chamados TI - .gitignore
+# ============================================
+
+# ---- Backend (Java / Maven) ----
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/.mvn/wrapper/maven-wrapper.properties
+*.class
+*.log
+*.jar
+*.war
+*.ear
+*.nar
+
+# ---- Frontend (Node, se um dia usar) ----
+node_modules/
+frontend/node_modules/
+dist/
+build/
+.vite/
+.next/
+
+# ---- Docker ----
+docker-compose.override.yml
+*.pid
+mysql_data/
+.docker/
+
+# ---- IDE ----
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+nbproject/private/
+.nb-gradle/
+
+# ---- Sistema Operacional ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Variáveis de ambiente ----
+.env
+.env.local
+.env.*.local
+
+# ---- Logs ----
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ---- Arquivos temporários ----
+*.tmp
+*.bak
+*.swp
+*~
+
+# ---- Dados locais do MySQL (se houver) ----
+*.sql.gz

@@ -1,0 +1,153 @@
+C:.
+|   docker-compose.yaml
+|
++---bd
+|       init.sql
+|
+\---src
+    \---java
+        |   .gitattributes
+        |   .gitignore
+        |   Dockerfile-dev
+        |   HELP.md
+        |   mvnw
+        |   mvnw.cmd
+        |   pom.xml
+        |
+        +---.mvn
+        |   \---wrapper
+        |           maven-wrapper.properties
+        |
+        \---src
+            +---main
+            |   +---java
+            |   |   \---br
+            |   |       \---gov
+            |   |           \---to
+            |   |               \---prefeitura
+            |   |                   \---colinas
+            |   |                       \---sistema_chamados_ti
+            |   |                           |   SistemaChamadosTiApplication.java
+            |   |                           |
+            |   |                           +---config
+            |   |                           |       SecurityConfig.java
+            |   |                           |       WebMvcConfig.java
+            |   |                           |       DataInitializer.java
+            |   |                           |
+            |   |                           +---controller
+            |   |                           |       AuthController.java
+            |   |                           |       ChamadoController.java
+            |   |                           |       TecnicoController.java
+            |   |                           |       AdminController.java
+            |   |                           |       HomeController.java
+            |   |                           |
+            |   |                           +---dto
+            |   |                           |       UsuarioCadastroDTO.java
+            |   |                           |       ChamadoFormDTO.java
+            |   |                           |       TecnicoCadastroDTO.java
+            |   |                           |       LoginDTO.java
+            |   |                           |
+            |   |                           +---entity
+            |   |                           |   |   Usuario.java
+            |   |                           |   |   Tecnico.java
+            |   |                           |   |   Chamado.java
+            |   |                           |   |
+            |   |                           |   \---enums
+            |   |                           |           SecretariaEnum.java
+            |   |                           |           StatusChamadoEnum.java
+            |   |                           |           PerfilEnum.java
+            |   |                           |
+            |   |                           +---exception
+            |   |                           |       GlobalExceptionHandler.java
+            |   |                           |       ChamadoNaoEncontradoException.java
+            |   |                           |       UsuarioNaoEncontradoException.java
+            |   |                           |
+            |   |                           +---repository
+            |   |                           |       UsuarioRepository.java
+            |   |                           |       TecnicoRepository.java
+            |   |                           |       ChamadoRepository.java
+            |   |                           |
+            |   |                           +---security
+            |   |                           |       CustomUserDetails.java
+            |   |                           |       CustomUserDetailsService.java
+            |   |                           |       SecurityUtils.java
+            |   |                           |
+            |   |                           \---service
+            |   |                               |   UsuarioService.java
+            |   |                               |   TecnicoService.java
+            |   |                               |   ChamadoService.java
+            |   |                               |   AuthService.java
+            |   |                               |
+            |   |                               \---impl
+            |   |                                       UsuarioServiceImpl.java
+            |   |                                       TecnicoServiceImpl.java
+            |   |                                       ChamadoServiceImpl.java
+            |   |                                       AuthServiceImpl.java
+            |   |
+            |   \---resources
+            |       |   application.properties
+            |       |   application-dev.properties
+            |       |   messages.properties
+            |       |
+            |       +---static
+            |       |   +---css
+            |       |   |       style.css
+            |       |   |       bootstrap.min.css
+            |       |   |
+            |       |   +---js
+            |       |   |       main.js
+            |       |   |       bootstrap.bundle.min.js
+            |       |   |       jquery.min.js
+            |       |   |
+            |       |   \---images
+            |       |           logo-prefeitura.png
+            |       |           favicon.ico
+            |       |
+            |       \---templates
+            |           +---auth
+            |           |       login.html
+            |           |       cadastro.html
+            |           |
+            |           +---chamados
+            |           |       novo-chamado.html
+            |           |       meus-chamados.html
+            |           |       detalhes-chamado.html
+            |           |
+            |           +---tecnico
+            |           |       painel-tecnico.html
+            |           |       atender-chamado.html
+            |           |
+            |           +---admin
+            |           |       painel-admin.html
+            |           |       cadastrar-tecnico.html
+            |           |       relatorios.html
+            |           |       gerenciar-usuarios.html
+            |           |
+            |           +---fragments
+            |           |       header.html
+            |           |       footer.html
+            |           |       sidebar.html
+            |           |       navbar.html
+            |           |
+            |           \---error
+            |                   403.html
+            |                   404.html
+            |                   500.html
+            |
+            \---test
+                \---java
+                    \---br
+                        \---gov
+                            \---to
+                                \---prefeitura
+                                    \---colinas
+                                        \---sistema_chamados_ti
+                                            |   SistemaChamadosTiApplicationTests.java
+                                            |
+                                            +---controller
+                                            |       AuthControllerTest.java
+                                            |       ChamadoControllerTest.java
+                                            |
+                                            \---service
+                                                    ChamadoServiceTest.java
+                                                    UsuarioServiceTest.java

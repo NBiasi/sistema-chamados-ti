@@ -1,0 +1,62 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: sistema_chamados_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "root123"
+      MYSQL_DATABASE: "sistema_chamados_ti"
+      MYSQL_USER: "sistema_user"
+      MYSQL_PASSWORD: "sistema_pass"
+    ports:
+      - "3306:3306"
+    volumes:
+      - "mysql_data:/var/lib/mysql"
+      - "./bd/init.sql:/docker-entrypoint-initdb.d/init.sql"
+    networks:
+      - sistema_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-proot123"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+      start_period: 60s
+    command: "--default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --init-connect='SET NAMES utf8mb4'"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sistema_chamados_backend
+    expose:
+      - "8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: "prod"
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/sistema_chamados_ti?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8&useUnicode=true"
+    env_file:
+      - .env
+    networks:
+      - sistema_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sistema_chamados_frontend
+    ports:
+      - "80:80"
+    volumes:
+      - "./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro"
+    depends_on:
+      - backend
+    networks:
+      - sistema_network
+
+volumes:
+  mysql_data:
+
+networks:
+  sistema_network:
+    driver: bridge
